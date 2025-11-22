@@ -1,0 +1,169 @@
+<Window x:Class="KonataClock.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:KonataClock.ViewModels"
+        mc:Ignorable="d"
+        Title="Konata Izumi Clock" Height="720" Width="1200">
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    <Window.Background>
+        <ImageBrush ImageSource="Assets/Images/main_background.png" Stretch="UniformToFill" />
+    </Window.Background>
+    <Grid Background="#AA0B1E3B">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Background="#55000000" Padding="16" CornerRadius="12" Margin="12" BorderBrush="#6FA8FF" BorderThickness="2">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                <Image Source="Assets/Images/konata_header.png" Height="64" Stretch="Uniform" />
+                <TextBlock Text="Konata Izumi Time Hub" FontSize="36" FontWeight="ExtraBold" Foreground="White" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Margin="12" Padding="12" Background="#770B1E3B" CornerRadius="12" BorderBrush="#6FA8FF" BorderThickness="2">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Image Source="Assets/Images/konata_clock.png" Height="80" />
+                        <StackPanel>
+                            <TextBlock Text="Current Time" FontSize="20" FontWeight="Bold" />
+                            <TextBlock Text="{Binding CurrentTimeDisplay}" FontSize="48" FontWeight="ExtraBold" />
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Text="Stay on Konata's schedule!" Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Margin="12" Padding="12" Background="#BB0B1E3B" CornerRadius="12" BorderBrush="#6FA8FF" BorderThickness="2">
+                <TabControl>
+                    <TabItem Header="Alarms">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Border Background="#55000000" Padding="10" CornerRadius="8" Margin="0,0,0,8" BorderBrush="#6FA8FF" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Image Source="Assets/Images/konata_alarm.png" Height="48" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="Time (HH:MM)" VerticalAlignment="Center" />
+                                        <TextBox Width="90" Text="{Binding NewAlarmTime, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="Label" VerticalAlignment="Center" />
+                                        <TextBox Width="200" Text="{Binding NewAlarmLabel, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button Content="Add Alarm" Click="AddAlarm_Click" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Alarms}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#44000000" Padding="10" CornerRadius="8" Margin="0,0,0,10" BorderBrush="#6FA8FF" BorderThickness="1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="2*" />
+                                                        <ColumnDefinition Width="2*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                        <Image Source="Assets/Images/konata_small.png" Height="48" />
+                                                        <StackPanel>
+                                                            <TextBox Text="{Binding Time, StringFormat=hh\\:mm}" Width="100" Tag="{Binding Id}" LostFocus="AlarmTime_LostFocus" />
+                                                            <TextBlock Text="{Binding TimeDisplay}" FontSize="12" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="Label" />
+                                                        <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}" Tag="{Binding Id}" LostFocus="AlarmLabel_LostFocus" />
+                                                    </StackPanel>
+
+                                                    <CheckBox Grid.Column="2" Content="Enabled" IsChecked="{Binding IsEnabled}" VerticalAlignment="Center" />
+                                                    <Button Grid.Column="3" Content="Delete" Tag="{Binding Id}" Click="DeleteAlarm_Click" />
+                                                    <Image Grid.Column="4" Source="Assets/Images/konata_cheer.png" Height="48" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="Stopwatch">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+                                <Image Source="Assets/Images/konata_stopwatch.png" Height="120" />
+                                <TextBlock Text="{Binding StopwatchDisplay}" FontSize="56" FontWeight="ExtraBold" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="Start/Pause" Click="StopwatchStartPause_Click" />
+                                <Button Content="Reset" Click="StopwatchReset_Click" />
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="Timer">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Background="#55000000" Padding="10" CornerRadius="8" Margin="0,0,0,8" BorderBrush="#6FA8FF" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Image Source="Assets/Images/konata_timer.png" Height="60" />
+                                    <TextBlock Text="Minutes" VerticalAlignment="Center" />
+                                    <TextBox Width="60" Text="{Binding TimerInputMinutes, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Text="Seconds" VerticalAlignment="Center" />
+                                    <TextBox Width="60" Text="{Binding TimerInputSeconds, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button Content="Start/Pause" Click="TimerStartPause_Click" />
+                                    <Button Content="Reset" Click="TimerReset_Click" />
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+                                <Image Source="Assets/Images/konata_cheer.png" Height="120" />
+                                <TextBlock Text="{Binding TimerDisplay}" FontSize="56" FontWeight="ExtraBold" />
+                                <TextBlock Text="Let Konata cheer you on!" />
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+
+        <Border Background="#CC0B1E3B" CornerRadius="10" Padding="12" BorderBrush="#6FA8FF" BorderThickness="2"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="12" Width="320" Visibility="{Binding IsNotificationVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Image Source="Assets/Images/konata_alert.png" Height="56" />
+                    <TextBlock Text="Konata says:" FontSize="18" FontWeight="Bold" />
+                </StackPanel>
+                <TextBlock Text="{Binding NotificationMessage}" TextWrapping="Wrap" FontSize="16" />
+                <Button Content="Dismiss" HorizontalAlignment="Right" Click="DismissNotification_Click" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
